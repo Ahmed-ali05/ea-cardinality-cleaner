@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+.DS_Store
+*.log
+*.qea
+*.qeax
+*.eap
+*.eapx
+*.feap
+*.previous

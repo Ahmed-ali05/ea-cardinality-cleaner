@@ -1,0 +1,19 @@
+{
+  "name": "ea-cardinality-cleaner",
+  "version": "0.1.0",
+  "description": "Hide Enterprise Architect connector labels while preserving cardinalities.",
+  "private": true,
+  "license": "MIT",
+  "author": "Ahmed Ali",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node --check scripts/ea-cardinality-cleaner.js",
+    "test": "node --test test/ea-cardinality-cleaner.test.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahmed05idk/ea-cardinality-cleaner.git"
+  }
+}
