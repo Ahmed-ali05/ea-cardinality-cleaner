@@ -8,7 +8,7 @@ Hide relationship labels in Enterprise Architect while keeping both cardinalitie
 
 1. In EA, open **Specialize → Tools → Script Library** and create a **Diagram Group** called `Tables`.
 2. Create a **JScript** named `Cardinality Cleaner` in that group. Open the downloaded file in a text editor, copy all its code into the script, and save.
-3. Open a diagram, right-click its background → **Scripts → Cardinality Cleaner**. Enter **1**.
+3. Open a diagram, right-click its background → **Specialize → Scripts → Cardinality Cleaner**. Enter **1**.
 
 Requires Enterprise Architect on Windows (Corporate, Unified, or Ultimate) and the **JScript** engine. No extra dependencies. The script's menu is in Italian.
 
@@ -22,7 +22,7 @@ Requires Enterprise Architect on Windows (Corporate, Unified, or Ultimate) and t
 
 ## Help
 
-- **Script missing from the context menu?** Check that the group's type is **Diagram**. You can also run it from the Script Library.
+- **Script missing from the context menu?** Look under **Specialize → Scripts**. In the Script Library, right-click the group → **Group Properties → Group Type: Diagram**. To run immediately, keep the diagram open and right-click the script → **Run Script**.
 - **Choice 2 missing?** Select a connector first and run from the Script Library. Diagram-wide label suppression must be off to clean only one relationship.
 - **Choice 3 missing?** There is no undo snapshot for this diagram under the current Windows user.
 - **An update failed?** Check **Script Output** and the diagram's editing permissions. The script stops before cleaning if it cannot save the undo snapshot.

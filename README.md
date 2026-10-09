@@ -8,7 +8,9 @@ Nasconde le etichette delle relazioni in Enterprise Architect e lascia visibili 
 
 1. In EA apri **Specialize → Tools → Script Library** e crea un **Diagram Group** chiamato `Tabelle`.
 2. Nel gruppo crea un **JScript** chiamato `Cardinality Cleaner`. Apri il file scaricato in un editor di testo, copia tutto il codice nello script e salva.
-3. Apri il diagramma, clic destro sullo sfondo → **Scripts → Cardinality Cleaner**. Digita **1**.
+3. Apri il diagramma, clic destro sullo sfondo → **Specialize → Scripts → Cardinality Cleaner**. Digita **1**.
+
+Se **Scripts** non compare: nella Script Library, clic destro sul gruppo → **Group Properties → Group Type: Diagram**. Per avviare subito: clic destro sullo script → **Run Script**, con il diagramma aperto.
 
 Servono Enterprise Architect su Windows (Corporate, Unified o Ultimate) e il motore **JScript**. Nessuna dipendenza da installare.
 

@@ -13,7 +13,9 @@ Scegli **JScript**: il ripristino usa i componenti COM disponibili su Windows. N
 
 ## Uso quotidiano
 
-Apri il diagramma, fai clic destro sullo sfondo e scegli **Scripts → Cardinality Cleaner**. Si apre un menu in italiano:
+Apri il diagramma, fai clic destro sullo sfondo e scegli **Specialize → Scripts → Cardinality Cleaner**. Si apre un menu in italiano:
+
+Se manca **Scripts**, nella Script Library fai clic destro sul gruppo → **Group Properties** e imposta **Group Type** su **Diagram**. Per avviare subito, lascia aperto il diagramma e fai clic destro sullo script nella Script Library → **Run Script**.
 
 | Scelta | Risultato |
 | --- | --- |
