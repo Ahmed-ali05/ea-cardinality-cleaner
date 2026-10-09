@@ -1,21 +1,30 @@
 # EA Cardinality Cleaner
 
-Un comando per nascondere le etichette delle relazioni in Enterprise Architect e lasciare visibili le cardinalità.
+Nasconde le etichette delle relazioni tra tabelle in Enterprise Architect e lascia visibili le cardinalità.
 
-**[Scarica Pulisci diagramma](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.3.0/pulisci-diagramma.js)** · [English](docs/usage.en.md)
+**[Scarica lo script](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.3.0/pulisci-diagramma.js)** · [English](docs/usage.en.md)
 
-## Installa e usa
+## Cosa serve
 
-1. In EA apri **Specialize → Tools → Script Library** e crea un **Diagram Group** chiamato `Tabelle`.
-2. Crea un **JScript** chiamato **Pulisci diagramma**. Apri il file scaricato in un editor di testo, incolla tutto il contenuto al posto del codice predefinito e salva.
-3. Apri il diagramma → **clic destro sullo sfondo → Specialize → Scripts → Pulisci diagramma**.
+Enterprise Architect su **Windows**, edizione **Corporate, Unified o Ultimate**. Lo script usa il motore **JScript** e non richiede installazioni aggiuntive.
 
-La pulizia parte subito, senza finestre o conferme. Rieseguila dopo aver aggiunto relazioni: quelle già corrette non vengono riscritte. Eventuali errori sono in **Script Output**.
+## Installazione
 
-**Aggiorni una vecchia versione?** Sostituisci tutto il codice dello script esistente e rinominalo **Pulisci diagramma**. Rimuovi il vecchio script **Ripristina** dal gruppo, se presente.
+1. Apri **Specialize → Tools → Script Library**.
+2. Crea un gruppo di tipo **Diagram Group** e chiamalo `Tabelle`.
+3. Nel gruppo crea un **JScript** chiamato **Pulisci diagramma**.
+4. Apri il file scaricato in un editor di testo, copia tutto il contenuto nello script al posto del codice predefinito e salva.
 
-Servono EA su Windows (Corporate, Unified o Ultimate) e **JScript**. Nessuna libreria aggiuntiva o gestione di file locali. La pulizia non offre un annullamento automatico.
+## Uso
 
-[Aiuto](docs/usage.it.md) · [MIT](LICENSE)
+Apri il diagramma e scegli:
 
-Test automatici con EA simulato; la verifica dentro Enterprise Architect resta da fare.
+**Clic destro sullo sfondo → Specialize → Scripts → Pulisci diagramma**
+
+Il comando lavora sulle relazioni visibili del diagramma aperto. Conserva le cardinalità, le posizioni delle linee e i colori. Non apre finestre da confermare.
+
+Dopo aver aggiunto relazioni, eseguilo di nuovo. Il riepilogo e gli eventuali errori sono in **Script Output**.
+
+[Aiuto](docs/usage.it.md) · [Licenza MIT](LICENSE)
+
+I test automatici usano un ambiente EA simulato. La verifica dentro Enterprise Architect resta da fare.

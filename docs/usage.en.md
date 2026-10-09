@@ -1,30 +1,36 @@
 # EA Cardinality Cleaner
 
-One command to hide relationship labels in Enterprise Architect while keeping both cardinalities visible.
+Hide table relationship labels in Enterprise Architect while keeping cardinalities visible.
 
-**[Download Pulisci diagramma](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.3.0/pulisci-diagramma.js)** · [Italiano](../README.md)
+**[Download the script](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.3.0/pulisci-diagramma.js)** · [Italiano](../README.md)
 
-## Install and run
+## Requirements
 
-1. In EA, open **Specialize → Tools → Script Library** and create a **Diagram Group** called `Tables`.
-2. Create a **JScript** named **Pulisci diagramma** (Clean diagram). Open the downloaded file in a text editor, replace the entire script template with its contents, and save.
-3. Open the diagram → **right-click background → Specialize → Scripts → Pulisci diagramma**.
+Enterprise Architect on **Windows**, **Corporate, Unified, or Ultimate** edition. The script uses **JScript** and needs no additional installation.
 
-The command runs immediately, with no input boxes, confirmations, or modal dialogs. Run it again after adding relationships; already configured links are not rewritten. Results and errors go to **Script Output**.
+## Install
 
-Requires EA on Windows (Corporate, Unified, or Ultimate), using **JScript**. No extra libraries or local file storage. There is no automatic undo.
+1. Open **Specialize → Tools → Script Library**.
+2. Create a **Diagram Group** named `Tables`.
+3. Create a **JScript** named **Pulisci diagramma** (Clean diagram) in that group.
+4. Open the downloaded file in a text editor, replace the entire script template with its contents, and save.
 
-## Update
+## Use
 
-Replace the old script's entire source, save, and rename it **Pulisci diagramma**. Remove the old **Ripristina** script from the group if installed. Downloading the file alone does not update scripts stored in EA.
+Open a diagram and choose:
+
+**Right-click background → Specialize → Scripts → Pulisci diagramma**
+
+The command cleans visible relationships in the open diagram. It preserves cardinalities, line positions, and colors. It runs without confirmation dialogs. Run it again after adding relationships. Results and errors appear in **Script Output**, in Italian.
 
 ## Help
 
-- **Scripts missing?** Check **Specialize → Scripts**. In the Script Library, right-click the group → **Group Properties → Group Type: Diagram**. You can also right-click the script → **Run Script**, with the diagram open.
-- **A dialog still appears?** EA is still using the old script source.
-- **An update failed?** Check **Script Output** and editing permissions. A failed relationship is skipped and processing continues. If global label suppression cannot be disabled, cleaning stops because it would still hide cardinalities.
-- **Text remains visible?** Custom notations or shape scripts may control it differently.
+- **Scripts missing?** In the Script Library, right-click the group → **Group Properties → Group Type: Diagram**. You can also right-click the script → **Run Script**, with the diagram open.
+- **Some labels unchanged?** Check **Script Output** and editing permissions. Individual failures are skipped. If global label suppression cannot be disabled, cleaning stops because cardinalities would remain hidden.
+- **Text still visible?** Reopen the diagram. Custom notations and shape scripts may render labels differently.
 
-The command preserves hidden relationships, line positions, colors, and other styles. Old local undo files are not accessed. Automated tests use simulated EA; live visual behavior still needs validation.
+The script saves the diagram before modifying label visibility. Cardinality values are unchanged. There is no automatic undo.
 
-[Technical details](development.md) · [Contributing](../CONTRIBUTING.md) · [MIT](../LICENSE)
+Automated tests use simulated EA. Live validation inside Enterprise Architect is still pending.
+
+[Technical details](development.md) · [MIT license](../LICENSE)

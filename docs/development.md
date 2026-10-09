@@ -1,6 +1,6 @@
 # Development
 
-The only installable file is `scripts/pulisci-diagramma.js`. It runs directly inside EA's JScript engine with `Repository` and `Session`. There is no build step, shared runtime, filesystem access, or undo dependency.
+The only installable file is `scripts/pulisci-diagramma.js`. It runs directly inside EA's JScript engine with `Repository` and `Session`. The file is edited and used directly; it requires no runtime dependencies.
 
 ## Visibility
 
