@@ -1,6 +1,6 @@
 # EA Cardinality Cleaner
 
-[![Checks](https://github.com/ahmed05idk/ea-cardinality-cleaner/actions/workflows/checks.yml/badge.svg)](https://github.com/ahmed05idk/ea-cardinality-cleaner/actions/workflows/checks.yml)
+[![Checks](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/actions/workflows/checks.yml/badge.svg)](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/actions/workflows/checks.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Hide relationship labels in Sparx Systems Enterprise Architect while keeping source and target cardinalities visible.
