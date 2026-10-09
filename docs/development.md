@@ -52,4 +52,4 @@ Use a disposable diagram with two or three tables and populated relationship car
 6. A manually edited label after cleaning is skipped during restore.
 7. Errors for a locked diagram are understandable and an undo-file write failure causes no label changes.
 
-Record EA build, edition, notation, and the result of each check. No live EA validation has been recorded for 0.1.0.
+Record EA build, edition, notation, and the result of each check. No live EA validation has been recorded yet.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 — 2026-10-09
+
+- Replace the long README with a direct download and three setup steps.
+- Add a short English guide and keep support details in separate documents.
+- Shorten the action menu and completion messages; show error and skipped counts only when needed.
+- Publish under Ahmed-ali05 after the ownership transfer.
+
 ## 0.1.0 — 2026-10-09
 
 Initial open-source release.

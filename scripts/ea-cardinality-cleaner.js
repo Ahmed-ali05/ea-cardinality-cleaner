@@ -1,4 +1,4 @@
-// EA Cardinality Cleaner 0.1.0
+// EA Cardinality Cleaner 0.1.1
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ahmed Ali
 // Standalone JScript for Sparx Systems Enterprise Architect.
@@ -24,7 +24,7 @@ function notify(message)
 {
     Session.Output(message);
     // Valore ufficiale di promptOK; nessuna libreria da includere.
-    Session.Prompt("Etichette delle relazioni\n\n" + message, 1);
+    Session.Prompt("Cardinality Cleaner\n\n" + message, 1);
 }
 
 function readStyleFlag(style, name)
@@ -216,10 +216,10 @@ function chooseAction(diagram, selectedId, store)
     var canSelect = selectedId > 0 && readStyleFlag(diagram.StyleEx, "SuppConnectorLabels") != "1";
     var canRestore = store.fso.FileExists(store.path);
     var help = "Diagramma: " + diagram.Name + "\n\n" +
-        "1 - Lascia solo le cardinalita': intero diagramma (" + available + " relazioni)\n" +
-        (canSelect ? "2 - Lascia solo le cardinalita': relazione selezionata\n" : "") +
-        (canRestore ? "3 - Ripristina l'ultima modifica a questo diagramma\n" : "") +
-        "0 - Esci\n\nDigita il numero. Annulla chiude senza modificare le etichette.";
+        "1 - Pulisci il diagramma (" + available + " relazioni)\n" +
+        (canSelect ? "2 - Pulisci la relazione selezionata\n" : "") +
+        (canRestore ? "3 - Annulla l'ultima pulizia\n" : "") +
+        "\nLe cardinalita' restano visibili.\nDigita il numero, oppure Annulla per uscire.";
     if (selectedId > 0 && !canSelect)
         help += "\n\nIl diagramma nasconde tutte le etichette: usa 1 per mostrare le cardinalita'.";
     while (true)
@@ -286,10 +286,9 @@ function cleanDiagram(diagram, selectedId, all, store)
         }
     }
     Repository.ReloadDiagram(diagram.DiagramID);
-    notify("Diagramma: " + diagram.Name + "\nRelazioni aggiornate: " + updated +
-        "\nGia' impostate: " + (targets.length - records.length) + "\nErrori: " + errors +
-        "\n\nCardinalita' visibili; altre etichette nascoste.\nRiesegui e scegli 3 per ripristinare l'ultima modifica." +
-        (errors > 0 ? "\nI dettagli degli errori sono nella finestra Script Output." : ""));
+    notify("Relazioni aggiornate: " + updated + "\nCardinalita' visibili; altre etichette nascoste." +
+        "\n\nPer annullare, riesegui e scegli 3." +
+        (errors > 0 ? "\nErrori: " + errors + ". Dettagli in Script Output." : ""));
 }
 
 function restoreDiagram(diagram, store)
@@ -351,10 +350,9 @@ function restoreDiagram(diagram, store)
         try { store.fso.DeleteFile(store.path); }
         catch (error) { Session.Output("Ripristino completato; file locale conservato: " + errorText(error)); }
     }
-    notify("Diagramma: " + diagram.Name + "\nRelazioni ripristinate: " + restored +
-        "\nVoci saltate: " + skipped + "\nErrori: " + errors +
-        (skipped > 0 ? "\n\nAlcune voci non esistono piu' o hanno etichette modificate successivamente.\nIl ripristino resta disponibile per le altre voci." : "") +
-        (errors > 0 ? "\nI dettagli degli errori sono nella finestra Script Output." : ""));
+    notify("Relazioni ripristinate: " + restored +
+        (skipped > 0 ? "\nVoci saltate: " + skipped + ". Relazioni rimosse o etichette modificate.\nIl ripristino resta disponibile." : "") +
+        (errors > 0 ? "\nErrori: " + errors + ". Dettagli in Script Output." : ""));
 }
 
 function main()

@@ -117,7 +117,7 @@ test('Selected relation leaves unrelated labels and diagram settings unchanged',
 });
 test('Whole-diagram suppression prevents misleading selected-only operation', () => {
     const s = fixture(); execute(s, ['2', '0'], 1);
-    assert.doesNotMatch(s.menus[0], /2 - Lascia/); assert.match(s.menus[0], /usa 1/); assert.equal(s.updateCalls, 0);
+    assert.doesNotMatch(s.menus[0], /2 -/); assert.match(s.menus[0], /usa 1/); assert.equal(s.updateCalls, 0);
 });
 test('Idempotent run preserves the previous undo file', () => {
     const s = fixture(); execute(s, '1'); const p = backupPath(s); const contents = s.files.get(p); const count = s.updateCalls;

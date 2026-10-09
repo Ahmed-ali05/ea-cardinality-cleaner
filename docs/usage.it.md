@@ -1,19 +1,19 @@
-# EA Cardinality Cleaner — Guida in italiano
+# Aiuto e ripristino
 
-[English README](../README.md)
+[Installazione rapida](../README.md) · [English](usage.en.md)
 
 ## Installazione, una sola volta
 
 1. In Enterprise Architect apri **Specialize → Tools → Script Library**.
 2. Crea un gruppo di tipo **Diagram Group**, chiamato `Tabelle`.
-3. Nel gruppo crea uno script **JScript**, chiamato `Etichette e cardinalità`.
-4. Apri `../scripts/ea-cardinality-cleaner.js`, copia **tutto** il contenuto, sostituisci il codice predefinito dello script e salva.
+3. Nel gruppo crea uno script **JScript**, chiamato `Cardinality Cleaner`.
+4. Apri lo [script](../scripts/ea-cardinality-cleaner.js), copia **tutto** il contenuto, sostituisci il codice predefinito dello script e salva.
 
 Scegli **JScript**: il ripristino usa i componenti COM disponibili su Windows. Non sono richieste librerie aggiuntive.
 
 ## Uso quotidiano
 
-Apri il diagramma, fai clic destro sullo sfondo e scegli **Scripts → Etichette e cardinalità**. Si apre un menu in italiano:
+Apri il diagramma, fai clic destro sullo sfondo e scegli **Scripts → Cardinality Cleaner**. Si apre un menu in italiano:
 
 | Scelta | Risultato |
 | --- | --- |
