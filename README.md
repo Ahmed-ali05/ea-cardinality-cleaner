@@ -1,29 +1,26 @@
 # EA Cardinality Cleaner
 
-Nasconde le etichette delle relazioni in Enterprise Architect e lascia visibili le cardinalità.
+Nasconde le etichette delle relazioni in Enterprise Architect e lascia visibili le cardinalità. Due comandi, nessun numero da digitare.
 
-**[Scarica lo script](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.1.1/ea-cardinality-cleaner.js)** · [English](docs/usage.en.md)
+**[Scarica i due script](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.2.0/ea-cardinality-cleaner.zip)** · [English](docs/usage.en.md)
 
-## Installa e usa
+## Installa
 
-1. In EA apri **Specialize → Tools → Script Library** e crea un **Diagram Group** chiamato `Tabelle`.
-2. Nel gruppo crea un **JScript** chiamato `Cardinality Cleaner`. Apri il file scaricato in un editor di testo, copia tutto il codice nello script e salva.
-3. Apri il diagramma, clic destro sullo sfondo → **Specialize → Scripts → Cardinality Cleaner**. Digita **1**.
+1. Estrai lo ZIP. In EA apri **Specialize → Tools → Script Library** e crea un **Diagram Group** chiamato `Tabelle`.
+2. Nel gruppo crea due **JScript**: **Pulisci diagramma** e **Ripristina**. Apri i file `.js` in un editor di testo e sostituisci il codice predefinito di ciascuno script con tutto il contenuto del file corrispondente.
+3. Salva entrambi gli script. Apri il diagramma e scegli **clic destro sullo sfondo → Specialize → Scripts → Pulisci diagramma**.
 
-Se **Scripts** non compare: nella Script Library, clic destro sul gruppo → **Group Properties → Group Type: Diagram**. Per avviare subito: clic destro sullo script → **Run Script**, con il diagramma aperto.
+Servono EA su Windows (Corporate, Unified o Ultimate) e il motore **JScript**. Non ci sono librerie aggiuntive da importare.
 
-Servono Enterprise Architect su Windows (Corporate, Unified o Ultimate) e il motore **JScript**. Nessuna dipendenza da installare.
+## Usa
 
-## Le tre azioni
+- **Pulisci diagramma** nasconde le altre etichette su tutte le relazioni visibili, mantenendo le cardinalità.
+- **Ripristina** annulla l'ultima pulizia. Si trova nello stesso menu.
 
-| Digita | Per |
-| --- | --- |
-| **1** | Pulire tutte le relazioni visibili del diagramma. |
-| **2** | Pulire solo la relazione selezionata, quando disponibile. |
-| **3** | Annullare l'ultima pulizia, quando disponibile. |
+I comandi partono subito e mostrano un breve risultato. Dopo aver aggiunto relazioni, esegui di nuovo **Pulisci diagramma**. Il ripristino è locale e ha un solo livello per diagramma.
 
-**Annulla** chiude senza modifiche. Dopo aver aggiunto relazioni, riesegui **1**. Il ripristino è locale e conserva un solo livello per diagramma.
+**Non trovi Scripts?** Nella Script Library, clic destro sul gruppo → **Group Properties → Group Type: Diagram**. Puoi anche avviare ciascun comando con **clic destro sullo script → Run Script**.
 
-Versione preliminare: i test automatici usano EA simulato; la verifica dentro Enterprise Architect resta da fare.
+[Passare dalla versione precedente](docs/usage.it.md#aggiornare-da-01x) · [Aiuto](docs/usage.it.md) · [MIT](LICENSE)
 
-[Aiuto e ripristino](docs/usage.it.md) · [Dettagli tecnici](docs/development.md) · [MIT](LICENSE)
+Versione preliminare: i test usano EA simulato; la verifica dentro Enterprise Architect resta da fare.

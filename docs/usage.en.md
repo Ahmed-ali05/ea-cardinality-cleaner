@@ -1,31 +1,35 @@
 # EA Cardinality Cleaner
 
-Hide relationship labels in Enterprise Architect while keeping both cardinalities visible.
+Hide relationship labels in Enterprise Architect while keeping both cardinalities visible. Two direct commands, no text input.
 
-**[Download the script](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.1.1/ea-cardinality-cleaner.js)** · [Italiano](../README.md)
+**[Download the two scripts](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.2.0/ea-cardinality-cleaner.zip)** · [Italiano](../README.md)
 
-## Install and run
+## Install
 
-1. In EA, open **Specialize → Tools → Script Library** and create a **Diagram Group** called `Tables`.
-2. Create a **JScript** named `Cardinality Cleaner` in that group. Open the downloaded file in a text editor, copy all its code into the script, and save.
-3. Open a diagram, right-click its background → **Specialize → Scripts → Cardinality Cleaner**. Enter **1**.
+1. Extract the ZIP. In EA, open **Specialize → Tools → Script Library** and create a **Diagram Group** called `Tables`.
+2. Create two **JScript** scripts named **Pulisci diagramma** (Clean diagram) and **Ripristina** (Restore). Open each `.js` file in a text editor and replace the corresponding script's entire template with that file's contents.
+3. Save both scripts. Open a diagram and choose **right-click background → Specialize → Scripts → Pulisci diagramma**.
 
-Requires Enterprise Architect on Windows (Corporate, Unified, or Ultimate) and the **JScript** engine. No extra dependencies. The script's menu is in Italian.
+Requires EA on Windows (Corporate, Unified, or Ultimate), using **JScript**. Each file is standalone; no extra libraries to import. Messages are in Italian.
 
-| Enter | Action |
-| --- | --- |
-| **1** | Clean all visible relationships in the diagram. |
-| **2** | Clean the selected relationship, when available. |
-| **3** | Undo the last changing run, when available. |
+## Use
 
-**Cancel** exits without changes. Run **1** again after adding relationships. Undo is local and has one level per diagram.
+- **Pulisci diagramma** cleans all visible relationships and keeps cardinalities visible, including when a connector is selected.
+- **Ripristina** restores the previous label visibility from the last changing run.
+
+Commands run immediately and display a short result. Run the cleaner again after adding relationships. Undo is local and has one level per diagram.
+
+## Updating from 0.1.x
+
+Replace the old `Cardinality Cleaner` script's entire source with `pulisci-diagramma.js`, save it, and rename it **Pulisci diagramma**. Add **Ripristina** as a second JScript containing `ripristina.js`.
+
+Existing undo snapshots remain compatible. Run **Ripristina** before another changing clean if you want to undo the previous run. If a text input box still opens, EA is still using the old source.
 
 ## Help
 
-- **Script missing from the context menu?** Look under **Specialize → Scripts**. In the Script Library, right-click the group → **Group Properties → Group Type: Diagram**. To run immediately, keep the diagram open and right-click the script → **Run Script**.
-- **Choice 2 missing?** Select a connector first and run from the Script Library. Diagram-wide label suppression must be off to clean only one relationship.
-- **Choice 3 missing?** There is no undo snapshot for this diagram under the current Windows user.
-- **An update failed?** Check **Script Output** and the diagram's editing permissions. The script stops before cleaning if it cannot save the undo snapshot.
+- **Scripts missing?** Look under **Specialize → Scripts**. In the Script Library, right-click the group → **Group Properties → Group Type: Diagram**. You can also right-click either script → **Run Script**, with the diagram open.
+- **No snapshot to restore?** It exists only after a changing clean, for the same project, diagram, and Windows user. A complete restore consumes it.
+- **Update failed?** Check **Script Output** and editing permissions. The cleaner stops before changing labels if it cannot save the snapshot.
 - **Text still visible?** Custom notations or shape scripts may control it differently.
 
 This is a preview: automated checks use simulated EA. Live visual behavior and COM integration still need validation.

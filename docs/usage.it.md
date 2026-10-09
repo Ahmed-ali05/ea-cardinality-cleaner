@@ -2,51 +2,40 @@
 
 [Installazione rapida](../README.md) · [English](usage.en.md)
 
-## Installazione, una sola volta
+## Aggiornare da 0.1.x
 
-1. In Enterprise Architect apri **Specialize → Tools → Script Library**.
-2. Crea un gruppo di tipo **Diagram Group**, chiamato `Tabelle`.
-3. Nel gruppo crea uno script **JScript**, chiamato `Cardinality Cleaner`.
-4. Apri lo [script](../scripts/ea-cardinality-cleaner.js), copia **tutto** il contenuto, sostituisci il codice predefinito dello script e salva.
+Non serve ricreare il gruppo in Enterprise Architect.
 
-Scegli **JScript**: il ripristino usa i componenti COM disponibili su Windows. Non sono richieste librerie aggiuntive.
+1. Scarica ed estrai il nuovo ZIP.
+2. Apri il vecchio script `Cardinality Cleaner`, sostituisci **tutto** il codice con `pulisci-diagramma.js` e salvalo. Rinominalo **Pulisci diagramma**.
+3. Nello stesso gruppo crea un **JScript** chiamato **Ripristina**, sostituisci il codice predefinito con tutto il contenuto di `ripristina.js` e salva.
 
-## Uso quotidiano
+Il formato dei ripristini è compatibile con 0.1.x. Se vuoi annullare la pulizia precedente, esegui **Ripristina** prima di fare una nuova pulizia.
 
-Apri il diagramma, fai clic destro sullo sfondo e scegli **Specialize → Scripts → Cardinality Cleaner**. Si apre un menu in italiano:
+## Non trovo il comando
 
-Se manca **Scripts**, nella Script Library fai clic destro sul gruppo → **Group Properties** e imposta **Group Type** su **Diagram**. Per avviare subito, lascia aperto il diagramma e fai clic destro sullo script nella Script Library → **Run Script**.
+Il percorso è **clic destro sullo sfondo del diagramma → Specialize → Scripts**.
 
-| Scelta | Risultato |
-| --- | --- |
-| **1** | Nasconde le altre etichette di tutte le relazioni visibili nel diagramma e mostra le cardinalità. |
-| **2** | Applica la stessa visualizzazione alla sola relazione selezionata. Seleziona prima la linea; poi avvia lo script dalla Script Library. |
-| **3** | Ripristina la visualizzazione precedente all'ultima esecuzione che ha modificato le etichette. |
-| **0** o **Annulla** | Esce senza modificare le etichette. |
+Nella Script Library, clic destro sul gruppo → **Group Properties**: **Group Type** deve essere **Diagram**. Il nome del gruppo da solo non ne determina il tipo.
 
-La scelta **2** compare quando una relazione è selezionata. Se il diagramma ha attivo **Suppress All Connector Labels**, compare solo la scelta per l'intero diagramma: disattivare quell'opzione per una singola relazione cambierebbe anche le altre.
+Per avviare subito, lascia il diagramma aperto e scegli **clic destro sullo script nella Script Library → Run Script**.
 
-La scelta **3** compare quando esiste un ripristino per quel diagramma. Un'esecuzione che non cambia nulla conserva il ripristino precedente. Una nuova esecuzione con modifiche lo sostituisce: è disponibile **un solo livello di ripristino per diagramma**.
+## Compare ancora una casella di testo
 
-Alla fine una finestra mostra quante relazioni sono state aggiornate e gli eventuali errori. I dettagli degli errori si trovano nella finestra **Script Output**.
+È ancora installato il codice 0.1.x. Scaricare i nuovi file non aggiorna gli script salvati nel modello di EA: sostituisci il codice come indicato sopra.
 
-Dopo aver creato nuove relazioni, riesegui la scelta **1**. Lo script non si avvia automaticamente alla creazione di una relazione.
+## Ripristina dice che non c'è un ripristino
 
-## Cosa conserva il ripristino
+Il ripristino esiste solo dopo una pulizia che ha cambiato le etichette. È salvato sul computer dell'utente in `%LOCALAPPDATA%\EA-EtichetteRelazioni` e non è condiviso con altri utenti.
 
-Il ripristino recupera la visibilità precedente delle etichette e l'eventuale soppressione generale del diagramma. Conserva le posizioni delle linee, i colori e gli altri stili presenti al momento del ripristino. Se le etichette di una relazione sono state modificate manualmente dopo l'esecuzione, quella relazione viene saltata e segnalata.
+Una nuova pulizia con modifiche sostituisce la precedente; una pulizia che non cambia nulla la conserva. Un ripristino completo consuma il file. Spostare o rinominare il file del progetto può rendere il vecchio ripristino non disponibile.
 
-Il file di ripristino è salvato sul computer dell'utente in `%LOCALAPPDATA%\EA-EtichetteRelazioni`, prima di modificare le etichette. Non è condiviso con altri utenti. Se non può essere salvato, l'operazione si interrompe. La stringa di connessione del progetto non viene salvata nel file. Spostare o rinominare il file del progetto può rendere il vecchio ripristino non disponibile.
+## Errori o etichette ancora visibili
 
-Lo script mantiene visibili le etichette inferiori ai due estremi, usate per le cardinalità nelle relazioni standard tra tabelle. Non cambia i valori delle cardinalità. Notazioni o stereotipi personalizzati possono gestire diversamente le etichette.
+Apri **Script Output** per i dettagli e controlla i permessi sul diagramma. Se il file di ripristino non può essere salvato, la pulizia si interrompe prima di modificare le etichette.
 
-## Verifica
+Il ripristino conserva spostamenti delle linee, colori e altri stili. Le relazioni rimosse o con etichette modificate dopo la pulizia vengono saltate e segnalate. Un ripristino parziale rimane disponibile.
 
-Sintassi e flussi di applicazione/ripristino verificati con un ambiente simulato. La visualizzazione e i componenti COM devono ancora essere verificati dentro Enterprise Architect su Windows.
+Notazioni o shape script personalizzati possono gestire le etichette diversamente. Lo script non cambia i valori delle cardinalità e non si avvia automaticamente quando crei una relazione.
 
-## Riferimenti
-
-- [Menu contestuale degli script](https://smtp.sparxsystems.com/enterprise_architect_user_guide/17.2/add-ins___scripting/script_group_properties.html)
-- [Finestre di input e messaggi](https://news.sparxsystems.com/enterprise_architect_user_guide/17.2/add-ins___scripting/session_object.html)
-- [DiagramLink API](https://sparxsystems.com/enterprise_architect_user_guide/17.2/add-ins___scripting/diagramlinks.html)
-- [Indicazioni Sparx sulle etichette delle cardinalità](https://sparxsystems.com/forums/smf/index.php?topic=17431.0)
+[Dettagli tecnici](development.md) · [Menu del diagramma in EA](https://sparxsystems.com/enterprise_architect_user_guide/17.2/modeling_fundamentals/diagramcontextmenu2.html)

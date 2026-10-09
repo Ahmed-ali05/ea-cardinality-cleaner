@@ -4,7 +4,7 @@ Issues and pull requests are welcome. For a bug report, include:
 
 - Enterprise Architect version, build, and edition.
 - Connector type and diagram notation, including any custom MDG technology.
-- The menu choice used, expected result, and actual result.
+- The command used, expected result, and actual result.
 - Relevant **Script Output**, with project-specific information removed.
 
 Use a minimal example with invented table names. Do not upload private models, connection strings, credentials, or local undo files.
@@ -12,7 +12,7 @@ Use a minimal example with invented table names. Do not upload private models, c
 ## Make a change
 
 1. Fork the repository and create a branch.
-2. Keep `scripts/ea-cardinality-cleaner.js` standalone and compatible with EA's JScript engine. Avoid modules, modern JavaScript syntax, and extra runtime dependencies.
+2. Edit `src/cleaner.js` and regenerate the two standalone commands with `npm run build`. Keep the source compatible with EA's JScript engine. Avoid modules, modern JavaScript syntax, and extra runtime dependencies.
 3. Add a behavior test when fixing application or restore logic.
 4. Run `npm run check` and `npm test` with Node.js 22 or later.
 5. Open a pull request explaining the user-visible change and its validation.

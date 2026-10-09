@@ -2,9 +2,9 @@
 
 ## Runtime and test harness
 
-The installable artifact is `scripts/ea-cardinality-cleaner.js`. It runs directly in Enterprise Architect's JScript engine, which supplies `Repository` and `Session`. It uses Windows COM through `ActiveXObject` to save local undo snapshots.
+The installable artifacts are `scripts/pulisci-diagramma.js` and `scripts/ripristina.js`. Each runs directly in Enterprise Architect's JScript engine, which supplies `Repository` and `Session`. It uses Windows COM through `ActiveXObject` to save local undo snapshots.
 
-The Node.js test suite evaluates that exact source in a `vm` context. A mock repository, session, and file system exercise the complete menu/application/restore flows. Failed `Update()` calls do not persist mock records, matching the intended API contract.
+The Node.js test suite evaluates both standalone commands in a `vm` context. A mock repository, session, and file system exercise the complete application/restore flows, including no-text-input execution and compatibility with a snapshot produced by 0.1.1. Failed `Update()` calls do not persist mock records, matching the intended API contract.
 
 ## Visibility model
 
@@ -38,18 +38,31 @@ Restore locates a link by connector ID and instance ID and verifies its connecto
 
 A link is restored only if its labels still match the state produced by the cleaner, or are already in their original state. Other label states are treated as subsequent edits and skipped. Global suppression is restored only when there are no skipped entries or errors and the current global flag is still the expected value. A partial restore retains the snapshot.
 
-Only the most recent changing run is available through the menu. The `.previous` file is an internal replacement fallback, not an additional undo level.
+Only the most recent changing run is available through the Restore command. The `.previous` file is an internal replacement fallback, not an additional undo level.
+
+## Build the commands
+
+`src/cleaner.js` contains the shared EA-compatible implementation. `tools/build.cjs` generates two complete scripts, each calling a fixed action. EA does not need to import the shared source or install another library.
+
+```sh
+npm run build
+npm run check
+npm test
+```
+
+Commit both generated scripts when changing the source. `npm run check` checks their syntax and fails if they are out of date. The test suite executes the generated scripts rather than just the shared source. No command calls `Session.Input`; `Session.Prompt` only displays the result.
+
+The release ZIP contains both scripts, short installation instructions, and the MIT license. The local snapshot path and `EA_LABELS_V2` format remain unchanged from 0.1.x.
 
 ## Manual validation in Enterprise Architect
 
 Use a disposable diagram with two or three tables and populated relationship cardinalities. Check that:
 
-1. Choice **1** hides key names, stereotypes, and middle labels while keeping both cardinalities visible.
-2. Choice **2** affects only the selected visible relationship.
-3. Hidden relationships remain hidden.
-4. A repeated run reports that the selected relationships are already configured.
-5. Choice **3** restores the original labels after moving a line or changing its color.
-6. A manually edited label after cleaning is skipped during restore.
-7. Errors for a locked diagram are understandable and an undo-file write failure causes no label changes.
+1. **Pulisci diagramma** runs directly, hiding other labels while keeping both cardinalities visible.
+2. The command cleans all visible relationships even when one connector is selected; hidden relationships stay hidden.
+3. A repeated run leaves the previous undo available.
+4. **Ripristina** runs directly and restores labels after moving a line or changing its color.
+5. A manually edited label after cleaning is skipped during restore.
+6. Errors for a locked diagram, missing snapshot, or undo-file write failure are understandable.
 
 Record EA build, edition, notation, and the result of each check. No live EA validation has been recorded yet.

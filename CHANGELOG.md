@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 — 2026-10-09
+
+- Replace the text-input menu with two direct commands: **Pulisci diagramma** and **Ripristina**.
+- Clean all visible relationships with one command; remove the selected-only menu action.
+- Provide one ZIP containing two standalone scripts, installation instructions, and the MIT license.
+- Keep existing 0.1.x undo snapshots compatible and explain how to update scripts already saved in EA.
+- Generate both commands from one shared source and test the actual installable files.
+- Report partial failures without claiming all cardinalities are visible.
+
 ## 0.1.1 — 2026-10-09
 
 - Replace the long README with a direct download and three setup steps.

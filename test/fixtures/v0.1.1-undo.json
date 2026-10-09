@@ -1,0 +1,19 @@
+{
+  "rows": [
+    {
+      "id": 1,
+      "instance": 101,
+      "guid": "{CONNECTOR-1}",
+      "geometry": "SX=17;SY=-5;EDGE=3;$LLB=CX=10:HDN=0:CLR=-1;LRB=HDN=0;LLT=HDN=1;LRT=HDN=1;LMT=HDN=1:OX=55;LMB=HDN=1;IRHS=HDN=1;ILHS=HDN=1;",
+      "style": "Mode=3;Color=16;;HideLabels=0;",
+      "hidden": false
+    }
+  ],
+  "style": "Other=1;SuppConnectorLabels=0;",
+  "files": [
+    [
+      "C:\\Local\\EA-EtichetteRelazioni\\db8212de-DIAGRAM-7.txt",
+      "EA_LABELS_V2\r\ndb8212de\r\n{DIAGRAM-7}\r\n1\r\n1\t101\t{CONNECTOR-1}\t1\t1\t1\t1\t0\t-\t0\t-\t-\t-"
+    ]
+  ]
+}
