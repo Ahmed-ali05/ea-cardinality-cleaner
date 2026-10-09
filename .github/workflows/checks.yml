@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: '24'
           package-manager-cache: false
-      - name: Check standalone commands and generated sources
+      - name: Check standalone JScript syntax
         run: npm run check
-      - name: Test application and restore behavior
+      - name: Test cleaning and failure handling
         run: npm test

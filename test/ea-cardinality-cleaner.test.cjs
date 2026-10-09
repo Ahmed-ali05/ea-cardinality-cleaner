@@ -4,206 +4,146 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { test } = require('node:test');
-const sources = {
-    clean: fs.readFileSync(path.join(__dirname, '../scripts/pulisci-diagramma.js'), 'utf8'),
-    restore: fs.readFileSync(path.join(__dirname, '../scripts/ripristina.js'), 'utf8')
-};
-const initialGeometry = 'SX=17;SY=-5;EDGE=3;$LLB=CX=10:HDN=1:CLR=-1;LRB=HDN=1;LLT=HDN=0;LRT=;LMT=HDN=0:OX=55;LMB=;IRHS=;ILHS=;';
-const freshGeometry = 'SX=17;SY=-5;EDGE=3;$LLB=;LRB=;LLT=;LRT=;LMT=;LMB=;IRHS=;ILHS=;';
-
-function row(id, geometry = initialGeometry, hidden = false) {
-    return { id, instance: 100 + id, guid: '{CONNECTOR-' + id + '}', geometry, style: 'Mode=3;Color=16;HideLabels=1;', hidden };
+const source = fs.readFileSync(path.join(__dirname, '../scripts/pulisci-diagramma.js'), 'utf8');
+const geometry = 'SX=17;SY=-5;EDGE=3;$LLB=CX=10:HDN=1:CLR=-1;LRB=HDN=1;LLT=HDN=0;LRT=;LMT=HDN=0:OX=55;LMB=;IRHS=;ILHS=;';
+const labels = ['LLB','LRB','LLT','LRT','LMT','LMB','IRHS','ILHS'];
+function row(id, hidden=false) { return {id,geometry,style:'Mode=3;Color=16;HideLabels=1;',hidden}; }
+function fixture(rows=[row(1),row(2)], style='Other=1;SuppConnectorLabels=1;') {
+    return {rows,style,outputs:[],calls:[],linkUpdates:0,diagramUpdates:0,reloads:0,
+        dialogs:0,input:0,files:0,failIds:new Set(),readFailIds:new Set(),indexFail:new Set()};
 }
-function fixture(rows = [row(1), row(2)], style = 'Other=1;SuppConnectorLabels=1;') {
-    return { rows, style, files: new Map(), folders: new Set(['C:\\Local']), saveCalls: 0, updateCalls: 0,
-        reloadCalls: 0, fsCalls: 0, serial: 0, inputCalls: 0, notices: [], outputs: [], failIds: new Set() };
+function flag(text,label) {
+    const segment = new RegExp('(?:^|;)\\$?'+label+'=([^;]*)').exec(text);
+    const match = segment && /(?:^|:)HDN=([^:]*)/.exec(segment[1]);
+    return match ? match[1] : null;
 }
-function execute(state, command = 'clean', selectedId = 0, noDiagram = false) {
-    const fso = {
-        BuildPath: (a, b) => a + '\\' + b,
-        FolderExists: p => state.folders.has(p),
-        CreateFolder: p => { state.folders.add(p); state.fsCalls++; },
-        FileExists: p => state.files.has(p),
-        GetTempName: () => 'temp-' + (++state.serial),
-        CreateTextFile: p => {
-            state.fsCalls++;
-            if (state.failWrite) throw new Error('write denied');
-            state.files.set(p, '');
-            return { Write: text => state.files.set(p, text), Close: () => {} };
-        },
-        OpenTextFile: p => { if (!state.files.has(p)) throw new Error('file missing'); return { ReadAll: () => state.files.get(p), Close: () => {} }; },
-        DeleteFile: p => state.files.delete(p),
-        MoveFile: (from, to) => {
-            if (state.failMove && /temp-/.test(from) && !to.endsWith('.previous')) throw new Error('move denied');
-            if (!state.files.has(from)) throw new Error('file missing');
-            state.files.set(to, state.files.get(from)); state.files.delete(from);
-        }
-    };
+function execute(s) {
     function diagram() {
         return {
-            DiagramID: 7, DiagramGUID: '{DIAGRAM-7}', Name: 'Ordini', StyleEx: state.style,
-            SelectedConnector: selectedId ? { ConnectorID: selectedId } : null,
-            DiagramLinks: {
-                Count: state.rows.length,
-                GetAt: i => {
-                    const r = state.rows[i];
-                    const link = { ConnectorID: r.id, InstanceID: r.instance, Geometry: r.geometry, Style: r.style, IsHidden: r.hidden,
-                        Update() {
-                            if (state.failIds.has(r.id)) return false;
-                            r.geometry = this.Geometry; r.style = this.Style; state.updateCalls++; return true;
-                        }, GetLastError: () => 'access denied' };
-                    Object.defineProperty(link, 'HiddenLabels', {
-                        get() { return /(?:^|;)HideLabels=1(?:;|$)/.test(this.Style); },
-                        set(hidden) {
-                            this.Style = this.Style.replace(/(^|;)HideLabels=[^;]*/g, '$1') + 'HideLabels=' + (hidden ? '1' : '0') + ';';
-                        }
-                    });
-                    return link;
-                }
-            },
-            Update() { if (state.failDiagram) return false; state.style = this.StyleEx; state.updateCalls++; return true; },
-            GetLastError: () => 'diagram locked'
+            DiagramID:7,StyleEx:s.style,
+            get SelectedConnector() { throw Error('Selection must not change scope'); },
+            DiagramLinks:{Count:s.rows.length,GetAt(i) {
+                if (s.indexFail.has(i)) throw Error('unreadable instance');
+                const r=s.rows[i];
+                const link={ConnectorID:r.id,Style:r.style,IsHidden:r.hidden,
+                    Update() {
+                        if (s.failIds.has(r.id)) return false;
+                        r.geometry=this.Geometry;r.style=this.Style;s.linkUpdates++;return true;
+                    },GetLastError:()=> 'access denied'};
+                let current=r.geometry;
+                Object.defineProperty(link,'Geometry',{
+                    get() {if(s.readFailIds.has(r.id)) throw Error('geometry unreadable');return current;},
+                    set(v) {current=v;}
+                });
+                Object.defineProperty(link,'HiddenLabels',{
+                    get() {return /(?:^|;)HideLabels=1(?:;|$)/.test(this.Style);},
+                    set(hidden) {this.Style=this.Style.replace(/(^|;)HideLabels=[^;]*/g,'$1')+'HideLabels='+(hidden?'1':'0')+';';}
+                });
+                return link;
+            }},
+            Update() {if(s.failDiagram) return false;s.style=this.StyleEx;s.diagramUpdates++;return true;},
+            GetLastError:()=> 'diagram locked'
         };
     }
-    const context = {
-        Repository: {
-            ConnectionString: 'C:\\Models\\Sales.qea',
-            GetCurrentDiagram: () => noDiagram ? null : diagram(),
-            SaveDiagram: () => state.saveCalls++, GetDiagramByID: () => diagram(),
-            GetConnectorByID: id => { const r = state.rows.find(r => r.id === id); if (!r) throw new Error('deleted'); return { ConnectorGUID: r.guid }; },
-            ReloadDiagram: () => state.reloadCalls++
+    const context={
+        Repository:{
+            GetCurrentDiagram:()=>s.noDiagram?null:diagram(),
+            SaveDiagram() {s.calls.push('save');if(s.failSave) throw Error('save failed');if(s.onSave)s.onSave();},
+            GetDiagramByID() {s.calls.push('read');return s.missingAfterSave?null:diagram();},
+            GetConnectorByID() {throw Error('Must not read or edit model connector objects');},
+            ReloadDiagram() {s.calls.push('reload');s.reloads++;if(s.failReload)throw Error('refresh failed');}
         },
-        Session: { Input: () => { state.inputCalls++; throw new Error('Text input must not be requested'); },
-            Output: text => state.outputs.push(text), Prompt: text => { state.notices.push(text); return 1; } },
-        ActiveXObject: function (name) {
-            if (name === 'Scripting.FileSystemObject') return fso;
-            if (name === 'WScript.Shell') return { ExpandEnvironmentStrings: () => 'C:\\Local' };
-            throw new Error('Unknown COM object');
-        }
+        Session:{Output(text) {if(s.failLog)throw Error('output unavailable');s.outputs.push(text);},
+            Input() {s.input++;throw Error('No input allowed');},Prompt() {s.dialogs++;throw Error('No dialogs allowed');}},
+        ActiveXObject() {s.files++;throw Error('No file or shell COM access allowed');}
     };
-    vm.createContext(context);
-    vm.runInContext(sources[command], context);
-    return context;
+    vm.runInNewContext(source,context);
+    assert.equal(s.input,0);assert.equal(s.dialogs,0);assert.equal(s.files,0);
 }
-function backupPath(s) { return [...s.files.keys()].find(p => p.endsWith('.txt')); }
-function flag(geometry, label) {
-    const segment = new RegExp('(?:^|;)\\$?' + label + '=([^;]*)').exec(geometry);
-    if (!segment) return null;
-    const value = /(?:^|:)HDN=([^:]*)/.exec(segment[1]);
-    return value ? value[1] : null;
+function assertClean(r) {
+    for(const label of labels)assert.equal(flag(r.geometry,label),['LLB','LRB'].includes(label)?'0':'1');
 }
 
-test('No diagram produces a usable message without changing anything', () => {
-    const s = fixture(); execute(s, 'clean', 0, true);
-    assert.match(s.notices[0], /Apri il diagramma/); assert.equal(s.saveCalls, 0); assert.equal(s.fsCalls, 0);
+test('No open diagram logs guidance without modal UI or saves',()=>{
+    const s=fixture();s.noDiagram=true;execute(s);
+    assert.equal(s.calls.length,0);assert.match(s.outputs[0],/Apri un diagramma/);
 });
-test('Restore without a snapshot explains what happened without saving or updating', () => {
-    const s = fixture(); execute(s, 'restore');
-    assert.equal(s.saveCalls, 0); assert.equal(s.fsCalls, 0); assert.equal(s.updateCalls, 0);
-    assert.equal(s.inputCalls, 0); assert.match(s.notices.at(-1), /Non c'e' un ripristino/);
-});
-test('All visible relations retain both cardinalities; hidden links stay unchanged', () => {
-    const s = fixture([row(1), row(2, freshGeometry), row(3, initialGeometry, true)]);
-    execute(s, 'clean');
-    for (const r of s.rows.slice(0, 2)) {
-        assert.equal(flag(r.geometry, 'LLB'), '0'); assert.equal(flag(r.geometry, 'LRB'), '0');
-        for (const label of ['LLT', 'LRT', 'LMT', 'LMB', 'IRHS', 'ILHS']) assert.equal(flag(r.geometry, label), '1');
-        assert.match(r.geometry, /SX=17;SY=-5;EDGE=3;/); assert.match(r.style, /Color=16/);
+test('Clean keeps both cardinalities and preserves hidden relationships, positions and styles',()=>{
+    const s=fixture([row(1),row(2),row(3,true)]);execute(s);
+    for(const r of s.rows.slice(0,2)) {
+        assertClean(r);assert.match(r.geometry,/SX=17;SY=-5;EDGE=3;/);assert.match(r.geometry,/OX=55/);
+        assert.match(r.style,/Color=16/);assert.match(r.style,/Mode=3/);
     }
-    assert.equal(s.rows[2].geometry, initialGeometry); assert.match(s.style, /SuppConnectorLabels=0/);
-    assert.ok(backupPath(s)); assert.match(s.notices.at(-1), /Relazioni aggiornate: 2/);
+    assert.equal(s.rows[2].geometry,geometry);assert.match(s.rows[2].style,/HideLabels=1/);
+    assert.match(s.style,/Other=1;SuppConnectorLabels=0/);assert.equal(s.reloads,1);
+    assert.match(s.outputs.at(-1),/Aggiornate: 2/);
 });
-test('Clean always applies to the whole diagram even when a connector is selected', () => {
-    const s = fixture(undefined, 'Other=1;'); execute(s, 'clean', 1);
-    for (const r of s.rows) assert.equal(flag(r.geometry, 'LLB'), '0');
-    assert.equal(s.style, 'Other=1;'); assert.match(s.notices.at(-1), /Relazioni aggiornate: 2/);
+test('Repeated clean makes no database updates or diagram reloads',()=>{
+    const s=fixture();execute(s);const updates=s.linkUpdates;const diagramUpdates=s.diagramUpdates;const reloads=s.reloads;
+    execute(s);assert.equal(s.linkUpdates,updates);assert.equal(s.diagramUpdates,diagramUpdates);assert.equal(s.reloads,reloads);
+    assert.match(s.outputs.at(-1),/Aggiornate: 0; gia' corrette: 2/);
 });
-test('Both direct commands run without requesting text input', () => {
-    const s = fixture(); execute(s, 'clean'); execute(s, 'restore');
-    assert.equal(s.inputCalls, 0); assert.equal(flag(s.rows[0].geometry, 'LLB'), '1');
-    assert.match(s.notices.at(-1), /Relazioni ripristinate: 2/);
+test('Absent or empty geometry gets the required flags',()=>{
+    const s=fixture([row(1),row(2)],'Other=1;');s.rows[0].geometry=null;s.rows[1].geometry='';execute(s);
+    s.rows.forEach(assertClean);assert.equal(s.diagramUpdates,0);assert.equal(s.style,'Other=1;');
 });
-test('Idempotent run preserves the previous undo file', () => {
-    const s = fixture(); execute(s, 'clean'); const p = backupPath(s); const contents = s.files.get(p); const count = s.updateCalls;
-    execute(s, 'clean'); assert.equal(s.files.get(p), contents); assert.equal(s.updateCalls, count); assert.match(s.notices.at(-1), /gia' solo/);
+test('Dollar-prefixed and plain LLB geometries keep unrelated fields',()=>{
+    const s=fixture([row(1),row(2)]);s.rows[1].geometry=geometry.replace('$LLB=','LLB=');execute(s);
+    s.rows.forEach(assertClean);assert.match(s.rows[0].geometry,/\$LLB=CX=10:HDN=0:CLR=-1/);
+    assert.match(s.rows[1].geometry,/;LLB=CX=10:HDN=0:CLR=-1/);
 });
-test('Restore recovers visibility while keeping later line moves, colors, and styles', () => {
-    const s = fixture(); execute(s, 'clean');
-    s.rows[0].geometry = s.rows[0].geometry.replace('SX=17', 'SX=999').replace('OX=55', 'OX=88');
-    s.rows[0].style = s.rows[0].style.replace('Color=16', 'Color=55') + 'LWidth=3;';
-    s.style += 'HandDraw=1;'; execute(s, 'restore');
-    assert.equal(flag(s.rows[0].geometry, 'LLB'), '1'); assert.equal(flag(s.rows[0].geometry, 'LRB'), '1');
-    assert.equal(flag(s.rows[0].geometry, 'LLT'), '0'); assert.equal(flag(s.rows[0].geometry, 'LRT'), null);
-    assert.match(s.rows[0].geometry, /SX=999/); assert.match(s.rows[0].geometry, /OX=88/);
-    assert.match(s.rows[0].style, /Color=55/); assert.match(s.rows[0].style, /LWidth=3/);
-    assert.match(s.style, /SuppConnectorLabels=1/); assert.match(s.style, /HandDraw=1/); assert.equal(backupPath(s), undefined);
+test('One failed Update does not prevent later relationships from cleaning',()=>{
+    const s=fixture();s.failIds.add(1);execute(s);
+    assert.equal(s.rows[0].geometry,geometry);assertClean(s.rows[1]);assert.equal(s.reloads,1);
+    assert.match(s.outputs.at(-1),/Aggiornate: 1; gia' corrette: 0; errori: 1/);
 });
-test('Restore respects manual label edits and keeps retry available', () => {
-    const s = fixture(); execute(s, 'clean'); s.rows[0].geometry = s.rows[0].geometry.replace('LLT=HDN=1', 'LLT=HDN=0');
-    execute(s, 'restore'); assert.equal(flag(s.rows[0].geometry, 'LLT'), '0'); assert.equal(flag(s.rows[0].geometry, 'LLB'), '0');
-    assert.equal(flag(s.rows[1].geometry, 'LLB'), '1'); assert.ok(backupPath(s)); assert.match(s.style, /SuppConnectorLabels=0/);
+test('Unreadable geometry on one link does not prevent cleaning the next',()=>{
+    const s=fixture();s.readFailIds.add(1);execute(s);
+    assert.equal(s.rows[0].geometry,geometry);assertClean(s.rows[1]);assert.match(s.outputs.at(-1),/errori: 1/);
 });
-test('Restore removes originally absent flags and preserves new coordinate values', () => {
-    const s = fixture([row(1, freshGeometry)], 'Other=1;'); execute(s, 'clean');
-    s.rows[0].geometry = s.rows[0].geometry.replace('$LLB=HDN=0', '$LLB=HDN=0:CX=123'); execute(s, 'restore');
-    assert.equal(flag(s.rows[0].geometry, 'LLB'), null); assert.match(s.rows[0].geometry, /\$LLB=CX=123/); assert.equal(s.style, 'Other=1;');
+test('An unreadable collection entry is skipped, without aborting the remaining entries',()=>{
+    const s=fixture();s.indexFail.add(0);execute(s);
+    assert.equal(s.rows[0].geometry,geometry);assertClean(s.rows[1]);assert.match(s.outputs.at(-1),/errori: 1/);
 });
-test('Backup write failure prevents all label updates', () => {
-    const s = fixture(); s.failWrite = true; execute(s, 'clean');
-    assert.equal(s.updateCalls, 0); assert.equal(s.rows[0].geometry, initialGeometry); assert.match(s.notices.at(-1), /Nessuna etichetta/);
+test('A locked diagram with global label suppression prevents ineffective link writes',()=>{
+    const s=fixture();s.failDiagram=true;execute(s);
+    assert.equal(s.linkUpdates,0);assert.equal(s.diagramUpdates,0);assert.equal(s.rows[0].geometry,geometry);
+    assert.equal(s.reloads,1);assert.match(s.outputs.at(-1),/diagram locked/);
 });
-test('Failed backup replacement retains the previous undo', () => {
-    const s = fixture(); execute(s, 'clean'); const p = backupPath(s); const contents = s.files.get(p);
-    s.rows.push(row(3)); s.failMove = true; const count = s.updateCalls; execute(s, 'clean');
-    assert.equal(s.files.get(p), contents); assert.equal(s.updateCalls, count); assert.equal(s.rows[2].geometry, initialGeometry);
+test('No visible relationships leave global settings unchanged',()=>{
+    const s=fixture([row(1,true)]);execute(s);
+    assert.equal(s.linkUpdates,0);assert.equal(s.diagramUpdates,0);assert.equal(s.reloads,0);
+    assert.match(s.outputs[0],/Nessuna relazione visibile/);
 });
-test('Partial update failures can restore the links actually changed', () => {
-    const s = fixture(); s.failIds.add(1); execute(s, 'clean'); assert.match(s.notices.at(-1), /Errori: 1/);
-    s.failIds.clear(); execute(s, 'restore'); assert.equal(flag(s.rows[1].geometry, 'LLB'), '1'); assert.equal(backupPath(s), undefined);
+test('Save failure stops before modifying labels',()=>{
+    const s=fixture();s.failSave=true;execute(s);
+    assert.equal(s.linkUpdates,0);assert.equal(s.diagramUpdates,0);assert.equal(s.reloads,0);
+    assert.match(s.outputs.at(-1),/save failed/);
 });
-test('Deleted or replaced connectors are not restored onto different relationships', () => {
-    const s = fixture(); execute(s, 'clean'); s.rows[0].guid = '{NEW-CONNECTOR}'; execute(s, 'restore');
-    assert.equal(flag(s.rows[0].geometry, 'LLB'), '0'); assert.equal(flag(s.rows[1].geometry, 'LLB'), '1'); assert.ok(backupPath(s));
+test('Diagram disappearing after save produces a diagnostic without writes',()=>{
+    const s=fixture();s.missingAfterSave=true;execute(s);
+    assert.equal(s.linkUpdates,0);assert.equal(s.diagramUpdates,0);assert.match(s.outputs.at(-1),/non e' disponibile/);
 });
-test('No visible relations produces an explanatory result', () => {
-    const s = fixture([]); execute(s, 'clean'); assert.equal(s.updateCalls, 0); assert.equal(s.fsCalls, 0); assert.match(s.notices.at(-1), /Non ci sono/);
+test('Pending diagram edits are saved before reading links and reloading once',()=>{
+    const s=fixture();s.onSave=()=>{s.rows.push(row(3));};execute(s);
+    assert.equal(s.rows.length,3);s.rows.forEach(assertClean);assert.deepEqual(s.calls,['save','read','reload']);
 });
-test('Restore with no open diagram does not attempt file access', () => {
-    const s = fixture(); execute(s, 'restore', 0, true);
-    assert.match(s.notices.at(-1), /Apri il diagramma/);
-    assert.equal(s.saveCalls, 0); assert.equal(s.fsCalls, 0); assert.equal(s.inputCalls, 0);
+test('Refresh failure leaves successful updates intact and logs the limitation',()=>{
+    const s=fixture();s.failReload=true;execute(s);
+    s.rows.forEach(assertClean);assert.match(s.outputs.at(-1),/Aggiornate: 2.*errori: 1/);
 });
-test('Invalid backup flags are rejected before restore writes', () => {
-    const s = fixture(); execute(s, 'clean'); const p = backupPath(s);
-    s.files.set(p, s.files.get(p).replace(/\t1\t1\t0\t/, '\t2\t1\t0\t'));
-    const count = s.updateCalls; execute(s, 'restore');
-    assert.equal(s.updateCalls, count); assert.match(s.notices.at(-1), /non valido/);
+test('A broken output pane cannot prevent cleanup',()=>{
+    const s=fixture();s.failLog=true;s.failIds.add(1);execute(s);
+    assertClean(s.rows[1]);assert.equal(s.reloads,1);
 });
-test('Multiple diagram-link instances of one connector restore independently', () => {
-    const a = row(1); const b = row(1, freshGeometry); b.instance = 500;
-    const s = fixture([a, b]); execute(s, 'clean'); execute(s, 'restore');
-    assert.equal(flag(s.rows[0].geometry, 'LLB'), '1'); assert.equal(flag(s.rows[1].geometry, 'LLB'), null);
-    assert.equal(backupPath(s), undefined);
+test('Many failures cap diagnostic output without stopping the iteration',()=>{
+    const s=fixture(Array.from({length:25},(_,i)=>row(i+1)),'Other=1;');
+    s.rows.forEach(r=>s.failIds.add(r.id));execute(s);
+    assert.equal(s.outputs.length,6);assert.match(s.outputs.at(-1),/errori: 25.*primi 5/);
 });
-test('A global-only change can be restored without changing relationship geometry', () => {
-    const s = fixture(); execute(s, 'clean'); execute(s, 'restore');
-    execute(s, 'clean'); const geometry = s.rows[0].geometry; s.style = 'Other=1;SuppConnectorLabels=1;';
-    execute(s, 'clean'); assert.match(s.style, /SuppConnectorLabels=0/); execute(s, 'restore');
-    assert.match(s.style, /SuppConnectorLabels=1/); assert.equal(s.rows[0].geometry, geometry);
-});
-test('A locked diagram prevents application and retains the recovery snapshot', () => {
-    const s = fixture(); s.failDiagram = true; execute(s, 'clean');
-    assert.equal(s.updateCalls, 0); assert.equal(s.rows[0].geometry, initialGeometry);
-    assert.ok(backupPath(s)); assert.match(s.notices.at(-1), /diagram locked/);
-});
-test('The new Restore command reads an undo snapshot produced by v0.1.1', () => {
-    const legacy = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/v0.1.1-undo.json'), 'utf8'));
-    const s = fixture(legacy.rows, legacy.style); s.files = new Map(legacy.files);
-    execute(s, 'restore');
-    for (const label of ['LLB', 'LRB', 'LLT', 'LRT', 'LMT', 'LMB', 'IRHS', 'ILHS']) {
-        assert.equal(flag(s.rows[0].geometry, label), flag(initialGeometry, label));
-    }
-    assert.match(s.style, /SuppConnectorLabels=1/);
-    assert.match(s.rows[0].style, /HideLabels=1/);
-    assert.equal(backupPath(s), undefined); assert.equal(s.inputCalls, 0);
+test('A larger diagram updates only new links after the first run',()=>{
+    const s=fixture(Array.from({length:400},(_,i)=>row(i+1)));execute(s);
+    assert.equal(s.linkUpdates,400);assert.equal(s.reloads,1);
+    s.rows.push(row(401));execute(s);assert.equal(s.linkUpdates,401);assert.equal(s.reloads,2);
+    assert.match(s.outputs.at(-1),/Aggiornate: 1; gia' corrette: 400/);
 });

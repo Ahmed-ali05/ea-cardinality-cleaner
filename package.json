@@ -1,6 +1,6 @@
 {
   "name": "ea-cardinality-cleaner",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Hide Enterprise Architect connector labels while preserving cardinalities.",
   "private": true,
   "license": "MIT",
@@ -9,9 +9,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "check": "node tools/build.cjs --check",
-    "test": "node --test test/ea-cardinality-cleaner.test.cjs",
-    "build": "node tools/build.cjs"
+    "check": "node --check scripts/pulisci-diagramma.js",
+    "test": "node --test test/ea-cardinality-cleaner.test.cjs"
   },
   "repository": {
     "type": "git",

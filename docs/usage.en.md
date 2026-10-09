@@ -1,37 +1,30 @@
 # EA Cardinality Cleaner
 
-Hide relationship labels in Enterprise Architect while keeping both cardinalities visible. Two direct commands, no text input.
+One command to hide relationship labels in Enterprise Architect while keeping both cardinalities visible.
 
-**[Download the two scripts](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.2.0/ea-cardinality-cleaner.zip)** · [Italiano](../README.md)
+**[Download Pulisci diagramma](https://github.com/Ahmed-ali05/ea-cardinality-cleaner/releases/download/v0.3.0/pulisci-diagramma.js)** · [Italiano](../README.md)
 
-## Install
+## Install and run
 
-1. Extract the ZIP. In EA, open **Specialize → Tools → Script Library** and create a **Diagram Group** called `Tables`.
-2. Create two **JScript** scripts named **Pulisci diagramma** (Clean diagram) and **Ripristina** (Restore). Open each `.js` file in a text editor and replace the corresponding script's entire template with that file's contents.
-3. Save both scripts. Open a diagram and choose **right-click background → Specialize → Scripts → Pulisci diagramma**.
+1. In EA, open **Specialize → Tools → Script Library** and create a **Diagram Group** called `Tables`.
+2. Create a **JScript** named **Pulisci diagramma** (Clean diagram). Open the downloaded file in a text editor, replace the entire script template with its contents, and save.
+3. Open the diagram → **right-click background → Specialize → Scripts → Pulisci diagramma**.
 
-Requires EA on Windows (Corporate, Unified, or Ultimate), using **JScript**. Each file is standalone; no extra libraries to import. Messages are in Italian.
+The command runs immediately, with no input boxes, confirmations, or modal dialogs. Run it again after adding relationships; already configured links are not rewritten. Results and errors go to **Script Output**.
 
-## Use
+Requires EA on Windows (Corporate, Unified, or Ultimate), using **JScript**. No extra libraries or local file storage. There is no automatic undo.
 
-- **Pulisci diagramma** cleans all visible relationships and keeps cardinalities visible, including when a connector is selected.
-- **Ripristina** restores the previous label visibility from the last changing run.
+## Update
 
-Commands run immediately and display a short result. Run the cleaner again after adding relationships. Undo is local and has one level per diagram.
-
-## Updating from 0.1.x
-
-Replace the old `Cardinality Cleaner` script's entire source with `pulisci-diagramma.js`, save it, and rename it **Pulisci diagramma**. Add **Ripristina** as a second JScript containing `ripristina.js`.
-
-Existing undo snapshots remain compatible. Run **Ripristina** before another changing clean if you want to undo the previous run. If a text input box still opens, EA is still using the old source.
+Replace the old script's entire source, save, and rename it **Pulisci diagramma**. Remove the old **Ripristina** script from the group if installed. Downloading the file alone does not update scripts stored in EA.
 
 ## Help
 
-- **Scripts missing?** Look under **Specialize → Scripts**. In the Script Library, right-click the group → **Group Properties → Group Type: Diagram**. You can also right-click either script → **Run Script**, with the diagram open.
-- **No snapshot to restore?** It exists only after a changing clean, for the same project, diagram, and Windows user. A complete restore consumes it.
-- **Update failed?** Check **Script Output** and editing permissions. The cleaner stops before changing labels if it cannot save the snapshot.
-- **Text still visible?** Custom notations or shape scripts may control it differently.
+- **Scripts missing?** Check **Specialize → Scripts**. In the Script Library, right-click the group → **Group Properties → Group Type: Diagram**. You can also right-click the script → **Run Script**, with the diagram open.
+- **A dialog still appears?** EA is still using the old script source.
+- **An update failed?** Check **Script Output** and editing permissions. A failed relationship is skipped and processing continues. If global label suppression cannot be disabled, cleaning stops because it would still hide cardinalities.
+- **Text remains visible?** Custom notations or shape scripts may control it differently.
 
-This is a preview: automated checks use simulated EA. Live visual behavior and COM integration still need validation.
+The command preserves hidden relationships, line positions, colors, and other styles. Old local undo files are not accessed. Automated tests use simulated EA; live visual behavior still needs validation.
 
 [Technical details](development.md) · [Contributing](../CONTRIBUTING.md) · [MIT](../LICENSE)

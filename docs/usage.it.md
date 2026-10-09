@@ -1,41 +1,37 @@
-# Aiuto e ripristino
+# Aiuto
 
 [Installazione rapida](../README.md) · [English](usage.en.md)
 
-## Aggiornare da 0.1.x
+## Aggiornare
 
-Non serve ricreare il gruppo in Enterprise Architect.
+Sostituisci **tutto** il codice del vecchio script con il nuovo `pulisci-diagramma.js`, salva e rinominalo **Pulisci diagramma**. Se avevi installato **Ripristina**, rimuovi quel vecchio script dal gruppo.
 
-1. Scarica ed estrai il nuovo ZIP.
-2. Apri il vecchio script `Cardinality Cleaner`, sostituisci **tutto** il codice con `pulisci-diagramma.js` e salvalo. Rinominalo **Pulisci diagramma**.
-3. Nello stesso gruppo crea un **JScript** chiamato **Ripristina**, sostituisci il codice predefinito con tutto il contenuto di `ripristina.js` e salva.
-
-Il formato dei ripristini è compatibile con 0.1.x. Se vuoi annullare la pulizia precedente, esegui **Ripristina** prima di fare una nuova pulizia.
+Scaricare il file non aggiorna automaticamente il codice salvato nel modello di EA.
 
 ## Non trovo il comando
 
-Il percorso è **clic destro sullo sfondo del diagramma → Specialize → Scripts**.
+Apri il diagramma e scegli **clic destro sullo sfondo → Specialize → Scripts → Pulisci diagramma**.
 
 Nella Script Library, clic destro sul gruppo → **Group Properties**: **Group Type** deve essere **Diagram**. Il nome del gruppo da solo non ne determina il tipo.
 
-Per avviare subito, lascia il diagramma aperto e scegli **clic destro sullo script nella Script Library → Run Script**.
+Puoi anche lasciare il diagramma aperto e scegliere **clic destro sullo script nella Script Library → Run Script**.
 
-## Compare ancora una casella di testo
+## Compare ancora una finestra
 
-È ancora installato il codice 0.1.x. Scaricare i nuovi file non aggiorna gli script salvati nel modello di EA: sostituisci il codice come indicato sopra.
-
-## Ripristina dice che non c'è un ripristino
-
-Il ripristino esiste solo dopo una pulizia che ha cambiato le etichette. È salvato sul computer dell'utente in `%LOCALAPPDATA%\EA-EtichetteRelazioni` e non è condiviso con altri utenti.
-
-Una nuova pulizia con modifiche sostituisce la precedente; una pulizia che non cambia nulla la conserva. Un ripristino completo consuma il file. Spostare o rinominare il file del progetto può rendere il vecchio ripristino non disponibile.
+È ancora installato il codice precedente. La versione 0.3.0 non usa caselle di testo, conferme o messaggi modali: sostituisci tutto il codice dello script e salva.
 
 ## Errori o etichette ancora visibili
 
-Apri **Script Output** per i dettagli e controlla i permessi sul diagramma. Se il file di ripristino non può essere salvato, la pulizia si interrompe prima di modificare le etichette.
+Apri **Script Output**: contiene il riepilogo e fino a cinque dettagli di errore per esecuzione. Una relazione non leggibile o non aggiornabile viene saltata e le altre vengono elaborate. I permessi di EA possono impedire una modifica; il comando non li aggira.
 
-Il ripristino conserva spostamenti delle linee, colori e altri stili. Le relazioni rimosse o con etichette modificate dopo la pulizia vengono saltate e segnalate. Un ripristino parziale rimane disponibile.
+Se il diagramma ha la soppressione globale delle etichette attiva e non può essere aggiornato, la pulizia si ferma: quella soppressione nasconderebbe anche le cardinalità. Se la vista non si aggiorna, riapri il diagramma.
 
-Notazioni o shape script personalizzati possono gestire le etichette diversamente. Lo script non cambia i valori delle cardinalità e non si avvia automaticamente quando crei una relazione.
+Notazioni e shape script personalizzati possono gestire le etichette diversamente. Lo script non cambia i valori delle cardinalità e si avvia soltanto quando lo esegui.
+
+## Cosa modifica
+
+La visibilità delle etichette nel diagramma attivo. Conserva le relazioni nascoste, le posizioni delle linee, i colori e gli altri stili. Salva il diagramma prima di modificare le etichette e lo ricarica una volta quando necessario.
+
+Non esiste un ripristino automatico. Il comando non legge, crea o cancella i file locali di backup delle vecchie versioni.
 
 [Dettagli tecnici](development.md) · [Menu del diagramma in EA](https://sparxsystems.com/enterprise_architect_user_guide/17.2/modeling_fundamentals/diagramcontextmenu2.html)

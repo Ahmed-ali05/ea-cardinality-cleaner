@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-10-09
+
+- Keep one command: **Pulisci diagramma**. Remove the restore command, local snapshots, and file-system COM dependencies.
+- Remove all text input and modal dialogs; write compact diagnostics to Script Output.
+- Skip unchanged links and reload the active diagram only once after attempted changes.
+- Continue after individual link read/update failures, and limit error details to five per run.
+- Stop before link writes if diagram-wide suppression cannot be disabled.
+- Ship one editable JScript with no build step and simplify installation and upgrade instructions.
+
 ## 0.2.0 — 2026-10-09
 
 - Replace the text-input menu with two direct commands: **Pulisci diagramma** and **Ripristina**.
